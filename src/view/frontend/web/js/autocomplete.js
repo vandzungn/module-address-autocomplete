@@ -81,6 +81,13 @@ define([
         console.error("ERROR: Google maps library failed to load");
     });
 
+    function extractUnit(val, addr) {
+        let regx = new RegExp('^(.*?)' + val);
+        let m = regx.exec(addr);
+        
+        return (m && m.length >=1 ? m[1] : "").trim();
+    }
+
     var fillInAddress = function () {
         var place = autocomplete.getPlace();
 
@@ -137,6 +144,9 @@ define([
         if (street.length > 0) {
             street[0] = streetNumber;
             var domID = uiRegistry.get('checkout.steps.shipping-step.shippingAddress.shipping-address-fieldset.street').elems()[0].uid;
+            if (streetNumber && streetNumber.indexOf('/') == -1) {
+                street[0] = extractUnit(streetNumber, $('#'+domID).val()) + streetNumber;
+            }
             var streetString = street.join(' ');
             if ($('#'+domID)) {
                 $('#'+domID).val(streetString);
